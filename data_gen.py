@@ -15,6 +15,10 @@ class DataGen:
         self._train = np.array(self._train)
         self._train, self._validation = train_test_split(self._train, test_size=.2)
         self._batch_size = batch_size
+        self._views = ['center', 'flip', 'left', 'right']
+
+    def samples_per_epoch():
+        return self._train.shape[0] * len(self._views)
 
     def next_train(self):
             num_samples = self._train.shape[0]
@@ -22,10 +26,22 @@ class DataGen:
                 shuffle(self._train)
                 for start in range(0, num_samples, self._batch_size):
                     end = start + self._batch_size
-                    images = [ cv2.imread("./data/" + x) for x in self._train[start:end, 0] ]
                     angles = [ float(x) for x in self._train[start:end, 3] ]
-                    train_out = shuffle(np.array(images), np.array(angles))
-                    yield train_out
+                    correction = .20
+                    for view in self._views:
+                        if view == 'center':
+                            images = [ cv2.imread("./data/" + x) for x in self._train[start:end, 0] ]
+                        else if view == 'flip':
+                            images = [ np.fliplr(cv2.imread("./data/" + x)) for x in self._train[start:end, 0] ]
+                            angles = -angles
+                        else if view == 'left':
+                            images = [ np.fliplr(cv2.imread("./data/" + x)) for x in self._train[start:end, 1] ]
+                            angles += correction
+                        else: #view == 'right'
+                            images = [ np.fliplr(cv2.imread("./data/" + x)) for x in self._train[start:end, 2] ]
+                            angles -= correction
+                        train_out = shuffle(np.array(images), np.array(angles))
+                        yield train_out
 
 
     def next_valid(self):
