@@ -37,7 +37,10 @@ The goals / steps of this project are the following:
 My project includes the following files:
 * model.py containing the script to create and train the model
 * drive.py for driving the car in autonomous mode
-* model.h5 containing a trained convolution neural network
+* model.h5.gz containing a trained convolution neural network.  The model was compressed to meet
+github's size requirements. To decompress, run
+
+    $gzip -d model.h5.gz
 * writeup_report.md or writeup_report.pdf summarizing the results
 
 ####2. Submission includes functional code
