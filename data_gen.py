@@ -1,11 +1,12 @@
 import csv
 import numpy as np
-import matplotlib.image as mp
+import cv2
+import matplotlib.image as mpimg
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
 
 class DataGen:
-    def __init__(self, log_file="./data/driving_log.csv", batch_size=16):
+    def __init__(self, log_file="./data/driving_log.csv", batch_size=128):
         self._train = []
         with open(log_file) as csvf:
             reader = csv.reader(csvf)
@@ -30,7 +31,7 @@ class DataGen:
                     correction = .20
                     for view in self._views:
                         if view == 'center':
-                            images = [ mp.imread("./data/" + x.strip()) for x in self._train[start:end, 0] ]
+                            images = [ self._rand_brightness(x) for x in self._train[start:end, 0] ]
                             truth = np.array(angles)
                             train_out = shuffle(np.array(images), truth)
                             yield train_out
@@ -39,12 +40,12 @@ class DataGen:
                             train_out = shuffle(np.array(images), truth)
                             yield train_out
                         elif view == 'left':
-                            images = [ mp.imread("./data/" + x.strip()) for x in self._train[start:end, 1] ]
+                            images = [ self._rand_brightness(x) for x in self._train[start:end, 1] ]
                             truth = np.array(angles) + correction
                             train_out = shuffle(np.array(images), truth)
                             yield train_out
                         else: #view == 'right'
-                            images = [ mp.imread("./data/" + x.strip()) for x in self._train[start:end, 2] ]
+                            images = [ self._rand_brightness(x) for x in self._train[start:end, 2] ]
                             truth = np.array(angles) - correction
                             train_out = shuffle(np.array(images), truth)
                             yield train_out
@@ -56,7 +57,14 @@ class DataGen:
                 shuffle(self._validation)
                 for start in range(0, num_samples, self._batch_size):
                     end = start + self._batch_size
-                    images = [ mp.imread("./data/" + x) for x in self._validation[start:end, 0] ]
+                    images = [ mpimg.imread("./data/" + x) for x in self._validation[start:end, 0] ]
                     angles = [ float(x) for x in self._validation[start:end, 3] ]
                     valid_out = shuffle(np.array(images), np.array(angles))
                     yield valid_out
+
+    def _rand_brightness(self, fname):
+        img = cv2.imread("./data/" + fname.strip())
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        mask = np.zeros_like(hsv[:, :, 2]) + 255
+        hsv[:,:,2] = np.minimum((np.random.rand() -.5) * hsv[:, :, 2], mask)
+        return cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)

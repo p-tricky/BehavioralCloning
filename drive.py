@@ -11,6 +11,7 @@ import eventlet.wsgi
 from PIL import Image
 from flask import Flask
 from io import BytesIO
+import tensorflow as tf
 
 from keras.models import load_model
 import h5py
