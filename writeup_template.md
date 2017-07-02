@@ -55,12 +55,13 @@ The model.py file contains the code for training and saving the convolution neur
 ####1. An appropriate model architecture has been employed
 
 My model is based on the CNN used in NVIDIA's paper [End to End Learning for Self-Driving Cars](https://arxiv.org/pdf/1604.07316v1.pdf).
-The model has 5 convolutions.  The first 3 use 5x5 filters, and the last 2, 3x3.  The final depth of
-the convolutions is 64 layers.
+The model has 5 convolutions.  The first 3 convolutions use 5x5 filters, and the last 2, 3x3.  The final depth of
+the convolution output is 64 layers.  The output is flattened and passed to a deep neural network containing 3
+fully-connected layers.
 
-My model consists of a convolution neural network with 3x3 filter sizes and depths between 32 and 128 (model.py lines 18-24)
+The model includes RELU layers to introduce nonlinearity.
 
-The model includes RELU layers to introduce nonlinearity (code line 20), and the data is normalized in the model using a Keras lambda layer (code line 18).
+The data is normalized in the model using a Keras lambda layer ().
 
 ####2. Attempts to reduce overfitting in the model
 
